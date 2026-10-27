@@ -6,6 +6,24 @@ dated entries in the journal at the bottom. How-to commands are in `README.md`.
 
 ---
 
+## 0. Where we are / next steps (updated 2026-10-27, end of day)
+
+Running or finished on condor (check with `condor_q eprifti -totals`; files in `/eos/user/e/eprifti/PythiaCR/<sample>/`):
+
+| cluster | what | status at 2026-10-27 evening | next step when done |
+|---|---|---|---|
+| 9747148 | pp CUETP8M1 with PYTHIA 8.212 (`dijet_cuetp8m1_py8212`) | done, 100/100 files | — |
+| 9747689 | genCompare histograms of `dijet_cuetp8m1_py8212` → `compare/dijet_cuetp8m1_py8212/` | submitted | `hadd` → `compare/dijet_cuetp8m1_py8212.root`; `macros/plotCompare.C` official vs 8.313 vs 8.212: does 8.212 remove the 1–4% jet-level differences (§3)? |
+| 9747155 | p–Pb CUETP8M1 / CR-BLC 2 / CR-BLC 3 (`dijetppb_*`), 200 files each | CUETP8M1 done, others running | `condor/make_corr_list.sh <samples> > list; condor_submit corr.sub LIST=list`, then `postprocessing/run_tune.sh <sample>` (also per N_trk class) |
+| 9747690 | correlations of `dijetppb_cuetp8m1` → `corr/dijetppb_cuetp8m1/` | submitted | `postprocessing/run_tune.sh dijetppb_cuetp8m1` |
+| 9747318 | central p–Pb CUETP8M1 / CR-BLC 2 (`dijetppbcentral_*`), 200 files each | running | as above (HM185 / HM250) |
+
+Then: data vs tunes **per multiplicity class** (data per class already done: `postprocessing/input_data_nominal/`, table
+in §3d) with `postprocessing/plot_tunes_vs_data.C` on the `mult<lo>to<hi>` outputs, and the multiplicity trend of the
+in-cone ratio (data 0.214 → 0.289 from N_trk < 60 to ≥ 250) vs the simulation; commit + push to GitHub.
+
+---
+
 ## 1. Goal
 
 The in-jet ratio measured in data (jets pT > 60 GeV, Δr < 0.4, UE subtracted with the jet–V0 correlation method)
