@@ -1,6 +1,6 @@
 # PythiaCR
 
-Detailed record of decisions and results: `LOGBOOK.md`.
+Detailed record of decisions and results: `LOGBOOK.md`. Repository: https://github.com/Enea77/PythiaCR (code, cards, scripts, plots; generated events are on EOS `/eos/user/e/eprifti/PythiaCR/`).
 
 Generator-level PYTHIA 8 (8.313, LCG_107a) pp at 8.16 TeV in the pPb lab frame, to compare colour-reconnection
 models with the CMS pPb in-jet (Λ+Λ̄)/2K0S measurement. The generator writes trees in the layout of the

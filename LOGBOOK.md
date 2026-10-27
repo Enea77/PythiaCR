@@ -468,6 +468,8 @@ the MB classes), not merged with the default sample.
 - All productions complete (100 files each for CUETP8M1, CR-BLC 0/2/3, CP5, CP5-CR1, CP5-CR2; the 3 hung CR-BLC jobs replaced).
 - Correlation jobs for CR-BLC 0, CP5-CR1, CP5-CR2 submitted (cluster 9744876); merging + jetshape of the first four samples.
 - Nominal data fixed (§3c). Plots: variable bins and zoomed ratio panels (`plotCompare.C`, `plot_tunes_vs_data.C`).
+- Project put under git and pushed to https://github.com/Enea77/PythiaCR (private; `.gitignore` keeps events, ROOT
+  outputs, logs and the EOS symlinks out).
 - Residual standalone/official differences traced (§3): official σ_rel(120) ~3.5% high, one pTHat outlier event in the
   official pTHat-30 sample; PYTHIA 8.212 build + production submitted to test the version (cluster 9747148, seeds 5001–5100).
 
