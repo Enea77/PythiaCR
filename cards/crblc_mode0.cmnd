@@ -1,0 +1,4 @@
+MultipartonInteractions:pT0Ref = 2.12
+ColourReconnection:m0 = 2.9
+ColourReconnection:junctionCorrection = 1.43
+ColourReconnection:timeDilationMode = 0

@@ -1,0 +1,12 @@
+Tune:pp = 14
+StringPT:sigma = 0.335
+StringZ:aLund = 0.36
+StringZ:bLund = 0.56
+StringFlav:probQQtoQ = 0.078
+StringFlav:probStoUD = 0.2
+StringFlav:probQQ1toQQ0join = 0.0275,0.0275,0.0275,0.0275
+BeamRemnants:remnantMode = 1
+BeamRemnants:saturation = 5
+ColourReconnection:mode = 1
+ColourReconnection:allowDoubleJunRem = off
+ColourReconnection:allowJunctions = on

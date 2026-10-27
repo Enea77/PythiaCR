@@ -1,0 +1,5 @@
+# Angantyr NN cross-section fit for crblc_mode2 (same fit as CUETP8M1: checked for crblc_mode2, Monash-based total cross sections) at 8.16 TeV (from the fit printed by a full initialisation, 2026-10-27):
+# no refit in the production jobs
+HeavyIon:SigFitNGen = 0
+HeavyIon:SigFitDefAvNDb = 0.97
+HeavyIon:SigFitDefPar = 1.80,15.72,0.28

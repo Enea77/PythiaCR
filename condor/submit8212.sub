@@ -1,0 +1,32 @@
+# PYTHIA 8.212 version of submit.sub (el7 container): outputs in <OUTDIR>/<process>_<tune>_py8212/. Jobs per tune; outputs and job stdout/stderr go to EOS (<OUTDIR>/<process>_<tune>/), the condor log to logs/.
+#   condor_submit submit.sub                                       -> test: 1 short job per tune
+#   condor_submit submit.sub NJOBS=100 NEV=100000 FLAVOUR=workday SEEDOFFSET=10000
+#     -> 10M events per tune (~8 ms and ~3.5 kB per dijet event: ~15 min and ~350 MB per job)
+#   add TUNES=cuetp8m1 to run a single tune (several: TUNES="cuetp8m1 crblc_mode2")
+# Change SEEDOFFSET for every new submission so that seeds never repeat.
+# Defaults, overridden by NAME=value on the condor_submit command line
+P_PROC    = $(PROC:dijet)
+P_NJOBS   = $(NJOBS:1)
+P_NEV     = $(NEV:2000)
+P_FLAVOUR = $(FLAVOUR:espresso)
+P_SEEDOFF = $(SEEDOFFSET:0)
+P_TUNES   = $(TUNES:cuetp8m1 crblc_mode0 crblc_mode2 crblc_mode3)
+P_OUTDIR  = $(OUTDIR:root://eosuser.cern.ch//eos/user/e/eprifti/PythiaCR)
+
+SEEDEXPR = $(Process) + 1 + $(P_SEEDOFF)
+SEED     = $INT(SEEDEXPR)
+
+executable              = run_job8212.sh
+arguments               = $(P_PROC) $(tune) $(P_NEV) $(SEED)
+output                  = logs/$(P_PROC)_$(tune)_$(Cluster)_$(Process).out
+error                   = logs/$(P_PROC)_$(tune)_$(Cluster)_$(Process).err
+log                     = logs/$(Cluster).log
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_output_files   = $(P_PROC)_$(tune)_$(SEED).root
+output_destination      = $(P_OUTDIR)/$(P_PROC)_$(tune)_py8212/
+MY.XRDCP_CREATE_DIR     = True
++JobFlavour             = "$(P_FLAVOUR)"
+MY.WantOS               = "el7"
+
+queue $(P_NJOBS) tune in ($(P_TUNES))

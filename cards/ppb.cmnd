@@ -1,0 +1,9 @@
+# p-Pb at sqrt(s_NN) = 8.16 TeV with Angantyr (read after common.cmnd): beam A = 6.5 TeV proton (+z),
+# beam B = Pb with 2562.5 GeV per nucleon (Beams:eB is per nucleon for ions). HeavyIon:mode = 1 (default) switches
+# Angantyr on for ion beams. With a hard process (dijet.cmnd), Angantyr puts it in one nucleon-nucleon sub-collision
+# and fills the others with minimum-bias / diffractive sub-collisions.
+# Colour reconnection acts only inside each NN sub-collision (PYTHIA 8.3 default; see HeavyIons manual, ref. Lon23).
+Beams:idB = 1000822080
+# NN cross-section fit parameters per tune: cards/sigfit/<tune>.cmnd (read after the tune card)
+# store gen particles only near jets (the correlation code needs them only there; N_trk is in hiBin): ~4x smaller files
+PythiaCR:genParticleJetR = 0.8

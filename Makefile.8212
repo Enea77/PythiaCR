@@ -1,0 +1,10 @@
+# Same program built against PYTHIA 8.212 (the version of the official CMSSW_8_0_X sample), LCG_84 CentOS 7 view.
+# Build and run inside the el7 container:
+#   /cvmfs/cms.cern.ch/common/cmssw-el7 -- bash -c 'source setup8212.sh && make -f Makefile.8212'
+PY8      := /cvmfs/sft.cern.ch/lcg/releases/MCGenerators/pythia8/212-90044/x86_64-centos7-gcc49-opt
+CXXFLAGS := -O2 -std=c++11 $(shell fastjet-config --cxxflags) -I$(PY8)/include $(shell root-config --cflags)
+LDLIBS   := -L$(PY8)/lib -Wl,-rpath,$(PY8)/lib -lpythia8 -ldl $(shell root-config --libs) $(shell fastjet-config --libs)
+
+bin/runPythia8212: src/runPythia.cc
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)

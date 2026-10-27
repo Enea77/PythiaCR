@@ -1,0 +1,5 @@
+# Central-enriched p-Pb (read after ppb.cmnd): narrower Gaussian impact-parameter sampling (default width is guessed
+# by Angantyr); the impact-parameter weight in info.weight() keeps the sample unbiased. Tests (2000 events, CUETP8M1):
+# bWidth 1.5 fm gives ~4x more jet events in HM185 than the default and the first HM250 events (~1e-3 of the events);
+# narrower widths gain little (the tail comes from multiplicity fluctuations).
+HeavyIon:bWidth = 1.5

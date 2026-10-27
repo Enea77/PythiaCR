@@ -1,0 +1,26 @@
+# build products
+bin/
+*.so
+*.d
+*.pcm
+*_ACLiC_*
+AutoDict_*
+
+# generated events and test outputs (production files live on EOS: /eos/user/e/eprifti/PythiaCR/)
+output/
+correlations/test/
+*.sigfit
+
+# condor job logs
+condor/logs/
+
+# post-processing inputs: symlinks to EOS and the (large) jetshape.cpp outputs next to them
+postprocessing/input_*/
+
+# intermediate histogram files (remade by the macros/ and condor/ scripts)
+*.root
+!postprocessing/files/*.root
+
+# per-file logs and scratch plots
+*.log
+postprocessing/plots/tmp/

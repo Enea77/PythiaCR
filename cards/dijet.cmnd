@@ -1,0 +1,8 @@
+# QCD 2->2 with a pTHat^4.5 bias: flat-ish in pTHat, events carry weight info.weight()
+# (always fill with that weight). pTHatMin = 15 as the lowest official CMS sample: with the bias it costs only
+# ~10% of the jets > 60 GeV per event compared to pTHatMin = 30 (20k-event test, 2026-10-21).
+HardQCD:all = on
+PhaseSpace:pTHatMin = 15.
+PhaseSpace:bias2Selection = on
+PhaseSpace:bias2SelectionPow = 4.5
+PhaseSpace:bias2SelectionRef = 15.

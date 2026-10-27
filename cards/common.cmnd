@@ -1,0 +1,16 @@
+# pp at sqrt(s) = 8.16 TeV in the pPb lab frame: 6.5 TeV proton x 2.5625 TeV (Pb per nucleon) proton.
+# Beam A (6.5 TeV) goes to +z, so y_cm = +0.465: same direction as the official "pgoing" PYTHIA skims
+# (checked with the charged-particle eta distribution, 2026-10-21).
+# With |eta_lab| < 2 cuts on jets and V0s the two beam directions give the same result.
+Beams:idA = 2212
+Beams:idB = 2212
+Beams:frameType = 2
+Beams:eA = 6500.
+Beams:eB = 2562.5
+# CMS default decays (Pythia8CommonSettings, as in the official request HIN-pPb816Spring16GS-00052;
+# its ParticleDecays:allowPhotonRadiation = on no longer exists in PYTHIA 8.3):
+# particles with c*tau > 10 mm are stable,
+# i.e. K0S, Lambda, Xi, Omega, Sigma+- stay in the record, Sigma0 decays (its Lambda is primary)
+ParticleDecays:limitTau0 = on
+ParticleDecays:tau0Max = 10
+Next:numberCount = 10000

@@ -1,0 +1,5 @@
+# Angantyr NN cross-section fit for CUETP8M1 at 8.16 TeV (from the fit printed by a full initialisation, 2026-10-27):
+# no refit in the production jobs
+HeavyIon:SigFitNGen = 0
+HeavyIon:SigFitDefAvNDb = 0.97
+HeavyIon:SigFitDefPar = 1.80,15.72,0.28

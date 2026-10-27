@@ -1,0 +1,17 @@
+# gen jets x gen V0 correlations (correlations/genV0_analyzer.cpp), one job per 10 runPythia files.
+#   ./make_corr_list.sh dijet_cuetp8m1 dijet_crblc_mode2 ... > corr_list.txt
+#   condor_submit corr.sub
+# Outputs <prefix>_Lam.root, <prefix>_K0s.root -> /eos/user/e/eprifti/PythiaCR/corr/<sample>/
+executable              = corr_job.sh
+arguments               = $(files) $(prefix)
+output                  = logs/corr_$(sample)_$(Cluster)_$(Process).out
+error                   = logs/corr_$(sample)_$(Cluster)_$(Process).err
+log                     = logs/corr_$(Cluster).log
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_output_files   = $(prefix)_Lam.root, $(prefix)_K0s.root
+output_destination      = root://eosuser.cern.ch//eos/user/e/eprifti/PythiaCR/corr/$(sample)/
+MY.XRDCP_CREATE_DIR     = True
+request_memory          = 4000
++JobFlavour             = "longlunch"
+queue sample, files, prefix from $(LIST:corr_list.txt)

@@ -1,0 +1,6 @@
+# CMS CUETP8M1 (Configuration/Generator/python/Pythia8CUEP8M1Settings_cfi.py): Monash + MPI retune.
+# Expected tune of the official Summer16 pPb dijet sample (to be confirmed in McM / DAS).
+Tune:pp = 14
+MultipartonInteractions:pT0Ref = 2.4024
+MultipartonInteractions:ecmPow = 0.25208
+MultipartonInteractions:expPow = 1.6

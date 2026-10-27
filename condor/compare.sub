@@ -1,0 +1,14 @@
+# Gen-level comparison histograms (macros/genCompare.C), one job per input file.
+#   condor_submit compare.sub LIST=compare_list.txt
+# LIST lines: <input (root://...)> <output name> <scale> <pthatLo> <pthatHi> <subdir of compare/>
+executable              = compare_job.sh
+arguments               = $(infile) $(outfile) $(scale) $(lo) $(hi)
+output                  = logs/compare_$(Cluster)_$(Process).out
+error                   = logs/compare_$(Cluster)_$(Process).err
+log                     = logs/compare_$(Cluster).log
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_output_files   = $(outfile)
+transfer_output_remaps  = "$(outfile) = ../compare/$(subdir)/$(outfile)"
++JobFlavour             = "espresso"
+queue infile, outfile, scale, lo, hi, subdir from $(LIST:compare_list.txt)
