@@ -7,5 +7,8 @@ cd /afs/cern.ch/work/e/eprifti/PythiaCR/correlations
 FILES=${1//+/,}
 # p-Pb samples: correlations in the data N_trk classes, N_trk^offline = 0.844 x gen N_trk (see genV0_analyzer.cpp)
 OPT=""
-if [[ $2 == dijetppb* ]]; then OPT=",-1,true,0.844"; fi
+# pp variant <sample>_mult (same events): also filled in the data N_trk classes, for the per-class comparison with data
+if [[ $2 == dijetppb* || $2 == *_mult_corr* ]]; then OPT=",-1,true,0.844"; else OPT=",-1,false,1.0"; fi
+# variant <sample>_pthat<N>: events with pTHat < N skipped
+if [[ $2 =~ _pthat([0-9]+)_corr ]]; then OPT="$OPT,${BASH_REMATCH[1]}"; fi
 root -l -b -q "genV0_analyzer.cpp+(\"$FILES\",\"$_CONDOR_SCRATCH_DIR/$2\"$OPT)"

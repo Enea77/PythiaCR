@@ -1,0 +1,6 @@
+# Validation against ALICE JHEP07(2023)136 (pp 13 TeV, CR-BLC modes): symmetric pp at 13 TeV, minimum bias.
+# Read after common.cmnd (overrides its boosted 8.16 TeV beams; keeps the CMS decay settings: Xi, Omega stable,
+# so Lambda are primary incl. Sigma0, like ALICE's feed-down-corrected Lambda).
+Beams:frameType = 1
+Beams:eCM = 13000.
+SoftQCD:nonDiffractive = on

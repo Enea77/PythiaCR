@@ -15,7 +15,7 @@ for v in Lam K0s; do
   hadd -f -k $C/merged/MC_$v.root $C/${S}_corr*_$v.root > input_$S/hadd_$v.log 2>&1
   ln -sf $C/merged/MC_$v.root input_$S/MC_$v.root
   root -l -b -q "jetshape.cpp+(\"gen\",\"gen\",\"MC_$v\",\"input_$S/\",true,60,2,-1,-1,false,\"\")" > input_$S/js_MC_$v.log 2>&1
-  if [[ $S == dijetppb* ]]; then   # p-Pb: also the data N_trk classes (edges of CorrCfg::MultBins)
+  if [[ $S == dijetppb* || $S == *_mult ]]; then   # p-Pb and pp <sample>_mult: also the data N_trk classes (CorrCfg::MultBins)
     for c in 0:60 60:80 80:185 185:250 250:1000; do
       root -l -b -q "jetshape.cpp+(\"gen\",\"gen\",\"MC_$v\",\"input_$S/\",true,60,2,${c%%:*},${c##*:},false,\"\")" > input_$S/js_MC_${v}_mult${c%%:*}.log 2>&1
     done

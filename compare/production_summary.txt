@@ -1,0 +1,21 @@
+| sample | events | jets > 60 GeV | K0S (all) | Λ (all) | K0S in cone | Λ in cone | jobs | CPU (h) | CPU/event (ms) | max memory (MB) | disk (GB) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| dijet_cp5 | 10.0M | 13.8M | 40.7M | 12.8M | 9.4M | 3.3M | 100 | 36 | 13 | 108 | 32 |
+| dijet_cp5cr1 | 10.0M | 13.8M | 37.9M | 11.3M | 8.4M | 2.8M | 100 | 90 | 32 | 113 | 31 |
+| dijet_cp5cr2 | 10.0M | 13.9M | 40.1M | 12.6M | 9.0M | 3.2M | 100 | 61 | 22 | 118 | 31 |
+| dijet_crblc_mode0 | 10.0M | 13.7M | 42.3M | 15.1M | 9.4M | 3.4M | 100 | 257 | 92 | 102 | 35 |
+| dijet_crblc_mode2 | 10.0M | 13.7M | 38.2M | 17.1M | 9.2M | 3.7M | 100 | 53 | 19 | 101 | 34 |
+| dijet_crblc_mode3 | 10.0M | 13.7M | 40.2M | 16.6M | 9.4M | 3.5M | 100 | 73 | 26 | 102 | 35 |
+| dijet_cuetp8m1 | 10.0M | 13.7M | 41.2M | 13.1M | 10.1M | 3.5M | 100 | 30 | 11 | 103 | 33 |
+| dijet_cuetp8m1_py8212 | 10.0M | 13.7M | 40.9M | 13.2M | 10.1M | 3.5M | 100 | 62 | 22 | 109 | 33 |
+| dijetppb_crblc_mode2 | 10.0M | 13.8M | 56.0M | 23.4M | 9.7M | 3.9M | 200 | 130 | 47 | 142 | 21 |
+| dijetppb_crblc_mode3 | 9.9M | 13.8M | 56.6M | 22.6M | 9.8M | 3.7M | 199 | 158 | 57 | 142 | 21 |
+| dijetppb_cuetp8m1 | 10.0M | 13.8M | 62.1M | 19.1M | 10.7M | 3.7M | 200 | 60 | 21 | 141 | 21 |
+| dijetppbcentral_crblc_mode2 | 9.9M | 13.9M | 70.3M | 28.6M | 10.1M | 4.0M | 199 | 169 | 61 | 143 | 22 |
+| dijetppbcentral_cuetp8m1 | 10.0M | 13.9M | 79.6M | 24.1M | 11.2M | 3.8M | 200 | 87 | 31 | 142 | 23 |
+| minbiasppb_crblc_mode2 | 8.7M | – | – | – | – | – | 87 | 54 | 22 | 92 | 2 |
+| minbiasppb_crblc_mode3 | 9.1M | – | – | – | – | – | 91 | 62 | 25 | 92 | 2 |
+| minbiasppb_cuetp8m1 | 10.0M | – | – | – | – | – | 100 | 35 | 13 | 93 | 3 |
+| minbiasppbcentral_crblc_mode2 | 7.0M | – | – | – | – | – | 70 | 57 | 29 | 92 | 3 |
+| minbiasppbcentral_cuetp8m1 | 10.0M | – | – | – | – | – | 100 | 52 | 19 | 94 | 4 |
+| **total** | 174.7M | 179.2M | 646.2M | 229.6M | 126.7M | 46.1M | | 1523 | | | 384 |

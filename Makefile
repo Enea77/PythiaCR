@@ -7,3 +7,7 @@ bin/runPythia: src/runPythia.cc
 
 clean:
 	rm -rf bin
+
+bin/aliceCheck: src/aliceCheck.cc
+	@mkdir -p bin
+	$(CXX) $(CXXFLAGS) $< -o $@ $(LDLIBS)

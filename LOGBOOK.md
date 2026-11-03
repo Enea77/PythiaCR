@@ -221,6 +221,12 @@ numbers in `compare/plots_validation/summary.txt`):
    `condor/submit8212.sub`, `run_job8212.sh`), CUETP8M1, 10M events, cluster 9747148, seeds 5001–5100, output
    `dijet_cuetp8m1_py8212`. Second-order candidate if needed: CMS uses `Tune:preferLHAPDF = 2` (LHAPDF6 copy of
    NNPDF2.3 LO instead of PYTHIA's internal grid).
+   **Result (2026-10-28, `compare/plots_py8212/`)**: the 8.212 build reproduces the official sample also at jet level →
+   the residual differences are the PYTHIA version (8.2 → 8.3), not our setup. Jet pT ratio to official: 8.212 flat at
+   1.00 ± 0.01 above 300 GeV (8.313: +1–3%); pTHat spectrum of events with a jet > 60: 8.212 at 1.00 in the 15–50 GeV
+   windows (8.313: 0.92 in 15–45) and up to 1 TeV, except the 120–170 window (0.975, the official σ_rel(120) of item 1).
+   The physics observables do not depend on the version: in-cone Λ/2K0S 3–10 GeV 0.1961 ± 0.0010 (8.212) vs
+   0.1960 ± 0.0010 (8.313) vs 0.1946 ± 0.0015 (official); K0S/jet 0.2249 / 0.2242 / 0.2245, Λ/jet 0.0882 / 0.0879 / 0.0874.
 4. Observables of the measurement agree within statistics already: in-cone Λ/2K0S 3–10 GeV 0.1960 ± 0.0010 vs
    0.1946 ± 0.0015 (0.8σ); through the full correlation chain 0.1955 ± 0.0010 vs 0.1964 ± 0.0012 (0.6σ);
    Λ/2K0S vs pT and vs Δr within 1–2σ bin by bin.
@@ -411,6 +417,52 @@ the MB classes), not merged with the default sample.
 | HM185 (185–250) | 0.2759 ± 0.0026 | 0.120 | 0.264 | 0.291 | 0.295 | 0.234 |
 | HM250 (≥ 250) | 0.2893 ± 0.0081 | 0.107 | 0.293 | 0.297 | 0.314 | 0.254 |
 
+**First p–Pb result, CUETP8M1 (2026-10-28)**, full chain, nominal, `postprocessing/run_tunes_vs_data.sh` →
+`postprocessing/plots/tunes_vs_data_mult/<class>/`: in-cone Λ/2K0S 3–10 GeV MB integrated 0.2063 ± 0.0050 (pp 0.1955),
+0–60: 0.1961 ± 0.0023, 60–80: 0.1930 ± 0.0029, 80–185: 0.2137 ± 0.0081, HM185: 0.19 ± 0.04, HM250: meaningless (0.09 ± 0.05).
+The statistical errors are 5–8× those of pp with the same number of events.
+
+**Why: event weights.** Already the raw (not UE-subtracted) in-cone Λ yield has ±3.6% (80–185) vs ±1% for K0S, so it is
+not the UE subtraction. Jet events (leading gen jet > 60 GeV), 20 files = 1M events:
+
+| pTHat window | p–Pb: share of Σw | events | share of Σw² | pp: share of Σw | events | share of Σw² |
+|---|---|---|---|---|---|---|
+| 15–20 | 1.1% | 2 | **62%** | 0.2% | 1 | 18% |
+| 20–30 | 2.1% | 31 | 18% | 0.4% | 11 | 8% |
+| 30–40 | 7.2% | 771 | 8% | 5.9% | 627 | 26% |
+| 40–50 | 16.6% | 5005 | 6% | 15.5% | 4423 | 24% |
+| 50–80 | 55.2% | 85569 | 5% | 57.6% | 82280 | 23% |
+| > 80 | 17.9% | 625787 | 0.2% | 20.5% | 625929 | 1% |
+
+N_eff = (Σw)²/Σw² = 0.95% of the jet events in p–Pb vs 5.8% in pp. In p–Pb a 60 GeV jet with a soft signal process
+(pTHat 15–30) is ~5× more frequent than in pp (UE of the other sub-collisions in the cone, or a hard scattering in
+another sub-collision), and those events carry the full (15/pTHat)^4.5 weight. Physical, but sampled by a handful of events.
+**Variant pTHat > 30** (`genV0_analyzer(..., pthatMin)`; sample name `<sample>_pthat30`, `corr_job.sh` takes the cut
+from the name): removes ~3% of the weighted jets (vs 0.6% in pp) and ~80% of Σw² → errors ~2× smaller.
+Correlations for the 5 p–Pb samples: cluster 9750316 (100 jobs) → `corr/<sample>_pthat30/`.
+
+**p–Pb results with pTHat > 30, all tunes (2026-11-03)**: `run_tunes_vs_data.sh _pthat30` →
+`postprocessing/plots/tunes_vs_data_mult_pthat30/<class>/`; multiplicity trend `postprocessing/plot_mult_trend.py` →
+`MultTrend_InCone.{pdf,png}`, `MultTrend.txt`. In-cone Λ/2K0S, 3–10 GeV (MC/data in brackets):
+
+| class | data | CUETP8M1 | CR-BLC 2 | CR-BLC 3 | central CUETP8M1 | central CR-BLC 2 |
+|---|---|---|---|---|---|---|
+| MB integrated | 0.2412 ± 0.0023 | 0.1949 ± 0.0013 (0.81) | 0.2241 ± 0.0016 (0.93) | 0.2086 ± 0.0015 (0.87) | 0.1974 ± 0.0024 (0.82) | 0.2189 ± 0.0027 (0.91) |
+| 0–60 | 0.2138 ± 0.0056 | 0.1961 ± 0.0022 (0.92) | 0.2194 ± 0.0027 (1.03) | 0.2040 ± 0.0024 (0.95) | 0.1894 ± 0.0054 (0.89) | 0.2253 ± 0.0079 (1.05) |
+| 60–80 | 0.2265 ± 0.0054 | 0.1941 ± 0.0025 (0.86) | 0.2236 ± 0.0028 (0.99) | 0.2103 ± 0.0028 (0.93) | 0.1925 ± 0.0067 (0.85) | 0.2179 ± 0.0052 (0.96) |
+| 80–185 | 0.2494 ± 0.0029 | 0.1950 ± 0.0018 (0.78) | 0.2258 ± 0.0022 (0.91) | 0.2101 ± 0.0021 (0.84) | 0.1989 ± 0.0029 (0.80) | 0.2178 ± 0.0034 (0.87) |
+| HM185 | 0.2759 ± 0.0026 | 0.193 ± 0.017 (0.70) | 0.21 ± 0.04 (0.77) | 0.17 ± 0.02 (0.63) | 0.209 ± 0.014 (0.76) | 0.245 ± 0.025 (0.89) |
+| HM250 | 0.2893 ± 0.0081 | 40–100% errors, not usable | | | | |
+
+- pTHat > 30 cuts the p–Pb errors by 2–4× (MB: 0.0050 → 0.0013 for CUETP8M1) and the p–Pb MB values agree with pp
+  (CUETP8M1 0.1949 vs 0.1955, CR-BLC 2 0.2241 vs 0.2200).
+- **The simulation has no multiplicity dependence**: all tunes are flat over 0–60 → 80–185 (within ±2%), while the data rise
+  by 17% (0.214 → 0.249) and keep rising at HM185 (0.276). This is expected, since CR acts only inside each NN sub-collision (§3d).
+  CR-BLC 2 agrees with data at low multiplicity (MC/data 1.03, 0.99) and falls behind with N_trk (0.91 at 80–185, ~0.8–0.9 at HM185).
+- HM185 is limited by MC statistics (±7–20%); HM250 cannot be used even with the central sample (~10k jet events/10M, few after weights).
+- Default (no pTHat cut) variant rerun as well (`plots/tunes_vs_data_mult/`); central CR-BLC 2 is missing there because its
+  `run_tune.sh` of 2026-10-28 stopped before the K0S outputs (pTHat > 30 variant is complete).
+
 ---
 
 ## 4. Tests and numbers
@@ -494,3 +546,64 @@ the MB classes), not merged with the default sample.
 **Seeds used so far**: 1–4 (tests), 1001–1100 (CUETP8M1 ycmNeg), 2001–2400 (cluster 9724871, CUETP8M1 + CR-BLC 0/2/3),
 3001–3003 (replacements), 4001–4300 (cluster 9726942, CP5 / CP5-CR1 / CP5-CR2).
 5001–5100 (cluster 9747148, CUETP8M1 with PYTHIA 8.212), 6001–6600 (cluster 9747155, p–Pb CUETP8M1 / CR-BLC 2 / CR-BLC 3), 7001–7400 (cluster 9747318, central p–Pb CUETP8M1 / CR-BLC 2). Next production must start at SEEDOFFSET ≥ 8000.
+
+**2026-10-28**
+- All p–Pb productions done; 2 jobs removed for wall time (CR-BLC 3 seed 6488, central CR-BLC 2 seed 7362), samples kept with 199/200 files.
+- PYTHIA 8.212 test: reproduces the official sample at jet level → residual differences = PYTHIA version (§3, item 3).
+- Correlations of the other 4 p–Pb samples (cluster 9750313, 80/80 OK); `run_tune.sh` on all 5 p–Pb samples.
+- New `postprocessing/run_tunes_vs_data.sh` (data vs tunes, MB + per N_trk class). p–Pb errors large: traced to low-pTHat
+  jet events with large weights (§3d); pTHat > 30 variant added to `genV0_analyzer.cpp` and submitted (cluster 9750316).
+
+**2026-11-03**
+- Cluster 9750316 done (pTHat > 30 correlations, 5 samples, 42 files each) and `run_tune.sh` done for all `_pthat30` samples; no jobs in the queue.
+- `run_tunes_vs_data.sh` rerun for both variants with all p–Pb samples; new `postprocessing/plot_mult_trend.py` (ratio vs N_trk class). Results in §3d.
+- `macros/genCompare.C` extended (old histograms unchanged): unweighted pTHat, all-event charged particles, per-event V0 pT
+  spectra (all events / jet events), V0 pT vs hiBin. Rerun on official (11 windows) + 8 pp + 5 p–Pb dijet samples:
+  cluster 9756650, 1809/1809 OK → `compare/v2/<sample>.root` (official kept per window in `compare/v2/official/`).
+- New `compare/plot_overview.py [v2]` (official vs tunes: pTHat unweighted | weighted, jets, charged, V0 spectra and Λ/2K0S,
+  ratio to official, variable bins ≤ 1–3% stat.) → `compare/plots_overview[_v2]/`. Nominal = sum of the official windows with
+  **the pTHat-120 window rescaled by 0.9657** (σ_rel(120) = 2.11e-4 from the overlaps, §3): removes the 120–170 bump; weighted
+  pTHat then agrees within 1% for all tunes above 30 GeV. The Pb-going set cannot replace it: its pTHat-120 file has 0 events.
+- Inclusive data Λ/2K0S (`plot_inclusive.C`, Inclusive_v4, classes 0,20,40,80,185 + HM185/HM250, stat. only; run in a scratch
+  dir) → `postprocessing/input_data_inclusive/`. New `postprocessing/plot_ratio_classes.py inclusive|incone` →
+  `postprocessing/plots/ratio_classes/` (data vs p–Pb PYTHIA per class, MC/data). Inclusive: PYTHIA dijet p–Pb peaks at
+  0.30–0.40 vs data 0.55–0.70 (2–5 GeV); low-mult and HM classes need MB MC.
+- MB p–Pb production (`condor/run_job.sh` processes `minbiasppb`, `minbiasppbcentral`; SoftQCD nonDiffractive + Angantyr, no
+  pTHat bias; ~16 ms and 0.3 kB per event): `minbiasppb` CUETP8M1 / CR-BLC 2 / CR-BLC 3, cluster 9756651, seeds 8001–8300;
+  `minbiasppbcentral` (bWidth 1.5 fm) CUETP8M1 / CR-BLC 2, cluster 9756652, seeds 9001–9200; 10M events each.
+  When done: genCompare on them (add to a compare list with subdir `v2/<sample>`), hadd, `plot_ratio_classes.py inclusive mb`.
+  **Next production: SEEDOFFSET ≥ 10000.**
+- Validation against ALICE JHEP07(2023)136 Fig. 7 (inclusive Λ/2K0S, pp 13 TeV MB, |η| < 0.75, CR-BLC band ~0.47–0.50 at
+  the 2.5–3 GeV peak): `cards/pp13_minbias.cmnd` (symmetric 13 TeV, SoftQCD nonDiffractive; read after common.cmnd).
+  20k-event local test: mode 2 / mode 3 match the ALICE band at 1–2 GeV (0.33/0.47 and 0.29/0.41 vs ~0.33/0.42),
+  mode 0 is lower (0.27/0.31), Monash 0.19/0.26. Full run: cluster 9756671, Monash + CR-BLC 0/2/3, 1M events each,
+  seeds 10001–10080.
+- ALICE reproduction with their exact definitions: new `src/aliceCheck.cc` (`make bin/aliceCheck`; generates and fills
+  histograms directly: inclusive V0s |η| < 0.75; charged anti-kT 0.4 jets from charged particles pT > 0.15, |η| < 0.9,
+  pT,jet > 10 GeV, |η_jet| < 0.35; JC R < 0.4 and two perpendicular cones), `cards/pp13_hardqcd.cmnd` (HardQCD, pTHat > 5,
+  bias pT^4), `condor/alice.sub` + `alice_job.sh` → `alice/<proc>_<tune>/`. In jets: cluster 9756672, 3M hard-QCD events
+  per tune (Monash, CR-BLC 0/2/3), seeds 11001–11240; inclusive: cluster 9756673, 2M MB events per tune, seeds 12001–12080.
+  Plot: `macros/plot_alice_check.py` → `compare/plots_alice/` (ALICE values read off Fig. 7 by eye; HEPData not reachable
+  from here). **Next production: SEEDOFFSET ≥ 13000.**
+- `macros/production_summary.py` → `compare/production_summary.txt` (events, jets, V0 counts, CPU, memory, disk per sample).
+- **ALICE reproduction result** (`compare/plots_alice/`; clusters 9756672/3, 316/320 jobs, 4 removed for wall time incl. 2 CR-BLC 0):
+  inclusive MB pp 13 TeV, |η| < 0.75: CR-BLC mode 2 reproduces ALICE's PYTHIA band and their data up to the peak (0.48 at
+  2.5–3 GeV vs band ~0.48–0.50); mode 3 peaks ~10% lower (0.43); **mode 0 peaks at 0.32**, close to Monash (0.36 at 3–4 GeV),
+  i.e. not "almost identical" to modes 2/3 as stated by ALICE (their PYTHIA version may differ; open). In jets (JC − PC):
+  all modes 0.22–0.34 above 2 GeV, compatible with ALICE data and band; below 2 GeV our JE errors are too large.
+- **MB p–Pb Angantyr** (clusters 9756651/2, 499/500 files; genCompare cluster 9756698) → `plot_ratio_classes.py inclusive mb`:
+  CR-BLC 2 reproduces the inclusive Λ/2K0S in the lowest classes (0–20, 20–40: MC/data ≈ 1 below 2 GeV, 0.8–0.9 at the
+  peak) and falls behind with multiplicity (40–80: 0.75, 80–185: 0.65, HM185: 0.45 at the peak); CUETP8M1 ≈ 0.55 everywhere.
+  → PYTHIA (CR-BLC) describes pp-like p–Pb, not the multiplicity-driven baryon enhancement.
+- pp multiplicity-binned correlations (`<sample>_mult`, `condor/corr_job.sh`, `run_tune.sh`): cluster 9756691.
+- `compare/plot_overview.py` now also overlays p–Pb dijet samples (pTHat, jets, V0; not charged: p–Pb files keep particles
+  only near jets) and the 8.212 copy (jets); data plots `plot_ratio_classes.py` default to the pp set (+ p–Pb CUETP8M1).
+- **Correction to §3 item 3** (v2 histograms, merged bins, `compare/plots_overview_v2/jets.png` with the 8.212 copy): the 8.212
+  build fixes the pTHat composition of the jet events (30–45 GeV: 0.96 vs 0.86 for 8.313) and the high-pT jets, but NOT the
+  ~2% deficit of the jet pT spectrum at 30–300 GeV (both builds 0.97–0.99 of official) nor the ~2–3% lower jet η
+  distribution. Something common to both builds and different from the official production remains. Candidates (not yet
+  tested): gen-jet definition in the CMS skims (neutrinos included? ours exclude them; +0.5% jet pT would give +2–3%),
+  CMS-only settings (Tune:preferLHAPDF = 2, ParticleDecays:allowPhotonRadiation in 8.2).
+- Feed-down check: in our generator Ξ/Ω are stable (cτ > 10 mm) → gen Λ = primary (incl. Σ0), as ALICE's feed-down-corrected
+  Λ. The CMS EPOS efficiency counts Λ from Ξ/Ω in the reco numerator but not in the gen denominator → corrected data ≈
+  primary Λ as well. Consistent; not a source of the data/MC gap.

@@ -6,7 +6,11 @@
 //                  threshold], weight branch = 1 (see macros/runOfficial.sh)
 //   runPythia    : scale = 1, no window (pTHat bias weight in the weight branch)
 // Jets: gen jets with pT > 60, |eta_WTA| < 2 (forest WTA axis). V0s: |eta| < 2. No UE subtraction.
-// All V0 histograms are filled per jet-V0 pair; divide by the jet count (hJetPt integral above 60) to get per-jet yields.
+// hInCone_*, hEvt_*, hDr_* are filled per jet-V0 pair; divide by the jet count (hJetPt integral above 60) to get per-jet yields.
+// Per-event histograms (2026-11-03): hPthatRaw (unweighted), hNchAll / hChEtaAll / hChPtAll (all events; p-Pb samples
+// store gen particles only near jets, so these are not inclusive there), hHiBin (hiBin = N_trk^offline in the official
+// skims, gen N_ch in runPythia), hV0PtAll_* (all events), hV0PtJetEvt_* (events with a jet > 60), hV0PtNtrk_* (pT vs hiBin,
+// all events). Optional 6th argument: maximum number of events (tests).
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1D.h"
@@ -25,7 +29,8 @@ double dR(double e1, double p1, double e2, double p2) {
 }
 }  // namespace
 
-void genCompare(const char* in, const char* out, double scale = 1., double pthatLo = -1., double pthatHi = 1e9) {
+void genCompare(const char* in, const char* out, double scale = 1., double pthatLo = -1., double pthatHi = 1e9,
+                Long64_t nMax = -1) {
   TFile* f = TFile::Open(in);
   TTree* t = (TTree*)f->Get("hiEvtAnalyzer/HiTree");
   t->AddFriend("ak4PFJetAnalyzer/t");
@@ -34,14 +39,14 @@ void genCompare(const char* in, const char* out, double scale = 1., double pthat
   for (auto n : v0n) t->AddFriend(Form("g%sTree/g%sTree", n, n));
   t->SetBranchStatus("*", 0);
 
-  Float_t pthat, weight; Int_t ngen;
+  Float_t pthat, weight; Int_t ngen, hiBin = 0;
   Float_t genpt[9999], weta[9999], wphi[9999];
   std::vector<double> *gpEta = nullptr, *gpPt = nullptr;
   std::vector<int>* gpChg = nullptr;
   std::vector<double>* vpt[3] = {}; std::vector<double>* veta[3] = {}; std::vector<double>* vphi[3] = {};
   std::vector<double>* lamMom = nullptr;
   auto br = [&](const char* n, void* a) { t->SetBranchStatus(n, 1); t->SetBranchAddress(n, a); };
-  br("pthat", &pthat); br("weight", &weight);
+  br("pthat", &pthat); br("weight", &weight); br("hiBin", &hiBin);
   br("ngen", &ngen); br("genpt", genpt); br("WTAgeneta", weta); br("WTAgenphi", wphi);
   br("eta", &gpEta); br("pt", &gpPt); br("chg", &gpChg);
   for (int s = 0; s < 3; ++s) {
@@ -78,22 +83,55 @@ void genCompare(const char* in, const char* out, double scale = 1., double pthat
     hDr[s] = new TH2D(Form("hDr_%s", v0n[s]), ";#Deltar;p_{T}^{V0} (GeV)", 20, 0, 1, 11, v0b);
   }
   TH1D* hLamSig0 = new TH1D("hLamSig0", ";in-cone #Lambda, 3 < p_{T} < 10: 0 other, 1 from #Sigma^{0};", 2, 0, 2);
-  for (auto h : {hPthat, hPthatJet, hJetPt, hJetEta, hNjetEvt, hNch, hChEta, hChPt}) h->Sumw2();
+  // per-event histograms
+  TH1D* hPthatRaw = new TH1D("hPthatRaw", ";#hat{p}_{T} (GeV);events (unweighted)", pb.size() - 1, pb.data());
+  TH1D* hNchAll = new TH1D("hNchAll", ";N_{ch} (|#eta| < 2.4, p_{T} > 0.4), all events;events", 150, 0, 300);
+  TH1D* hChEtaAll = new TH1D("hChEtaAll", ";#eta (charged, p_{T} > 0.4), all events;particles", 48, -2.4, 2.4);
+  TH1D* hChPtAll = new TH1D("hChPtAll", ";p_{T} (charged, |#eta| < 2.4), all events;particles", 100, 0, 20);
+  TH1D* hHiBin = new TH1D("hHiBin", ";hiBin (N_{trk});events", 500, 0, 500);
+  // inclusive analysis pT edges (v0-jet-analysis/inclusive/plot_inclusive.C) extended to 0.4 and 20 GeV
+  const double ib[] = {0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.4, 3.0, 3.6, 4.0, 5.0, 6.0, 7.0, 8.0, 10.0, 12.0, 15.0, 20.0};
+  const int nib = sizeof(ib) / sizeof(ib[0]) - 1;
+  TH1D *hV0All[3], *hV0Jet[3];
+  TH2D* hV0Ntrk[3];
+  for (int s = 0; s < 3; ++s) {
+    hV0All[s] = new TH1D(Form("hV0PtAll_%s", v0n[s]), ";p_{T}^{V0} (GeV);V0s (|#eta| < 2), all events", nib, ib);
+    hV0Jet[s] = new TH1D(Form("hV0PtJetEvt_%s", v0n[s]), ";p_{T}^{V0} (GeV);V0s (|#eta| < 2), events with a jet > 60", nib, ib);
+    hV0Ntrk[s] = new TH2D(Form("hV0PtNtrk_%s", v0n[s]), ";p_{T}^{V0} (GeV);hiBin", nib, ib, 500, 0, 500);
+    hV0All[s]->Sumw2(); hV0Jet[s]->Sumw2(); hV0Ntrk[s]->Sumw2();
+  }
+  for (auto h : {hPthat, hPthatJet, hJetPt, hJetEta, hNjetEvt, hNch, hChEta, hChPt, hPthatRaw, hNchAll, hChEtaAll, hChPtAll, hHiBin})
+    h->Sumw2();
   for (int s = 0; s < 3; ++s) { hInCone[s]->Sumw2(); hEvt[s]->Sumw2(); hDr[s]->Sumw2(); }
 
-  const Long64_t n = t->GetEntries();
+  const Long64_t n = (nMax > 0 && nMax < t->GetEntries()) ? nMax : t->GetEntries();
   if (scale < 0) scale = -scale / n;   // official skims: pass -SigmaRel, divided here by the events of the file
   for (Long64_t i = 0; i < n; ++i) {
     t->GetEntry(i);
     if (pthat <= pthatLo || pthat > pthatHi) continue;
     const double w = scale * weight;
     hPthat->Fill(pthat, w);
+    hPthatRaw->Fill(pthat);
+    hHiBin->Fill(hiBin, w);
     std::vector<int> jets;
     for (int j = 0; j < ngen; ++j) {
       if (std::fabs(weta[j]) >= kJetEtaMax) continue;
       hJetPt->Fill(genpt[j], w);
       if (genpt[j] > kJetPtMin) { jets.push_back(j); hJetEta->Fill(weta[j], w); }
     }
+    int nchAll = 0;
+    for (size_t k = 0; k < gpEta->size(); ++k) {
+      if ((*gpChg)[k] == 0 || (*gpPt)[k] <= 0.4 || std::fabs((*gpEta)[k]) >= 2.4) continue;
+      ++nchAll; hChEtaAll->Fill((*gpEta)[k], w); hChPtAll->Fill((*gpPt)[k], w);
+    }
+    hNchAll->Fill(nchAll, w);
+    for (int s = 0; s < 3; ++s)
+      for (size_t k = 0; k < vpt[s]->size(); ++k) {
+        if (std::fabs((*veta[s])[k]) >= kV0EtaMax) continue;
+        hV0All[s]->Fill((*vpt[s])[k], w);
+        hV0Ntrk[s]->Fill((*vpt[s])[k], hiBin, w);
+        if (!jets.empty()) hV0Jet[s]->Fill((*vpt[s])[k], w);
+      }
     if (jets.empty()) continue;
     hNjetEvt->Fill(0.5, w);
     hPthatJet->Fill(pthat, w);

@@ -1,0 +1,9 @@
+# ALICE in-jet check (aliceCheck): pp 13 TeV, hard QCD with a pTHat^4 bias from 5 GeV (events carry weights; charged
+# jets > 10 GeV need parton pT >~ 12 GeV, so pTHatMin = 5 loses nothing). Read after common.cmnd.
+Beams:frameType = 1
+Beams:eCM = 13000.
+HardQCD:all = on
+PhaseSpace:pTHatMin = 5.
+PhaseSpace:bias2Selection = on
+PhaseSpace:bias2SelectionPow = 4.
+PhaseSpace:bias2SelectionRef = 5.

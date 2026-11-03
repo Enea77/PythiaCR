@@ -1,0 +1,20 @@
+# ALICE JHEP07(2023)136 reproduction (bin/aliceCheck); outputs to ../alice/<proc>_<tune>/
+#   condor_submit alice.sub PROC=pp13_hardqcd NJOBS=60 NEV=50000 SEEDOFFSET=11000
+P_PROC    = $(PROC:pp13_minbias)
+P_NJOBS   = $(NJOBS:1)
+P_NEV     = $(NEV:2000)
+P_SEEDOFF = $(SEEDOFFSET:0)
+P_TUNES   = $(TUNES:monash crblc_mode0 crblc_mode2 crblc_mode3)
+SEEDEXPR  = $(Process) + 1 + $(P_SEEDOFF)
+SEED      = $INT(SEEDEXPR)
+executable              = alice_job.sh
+arguments               = $(P_PROC) $(tune) $(P_NEV) $(SEED)
+output                  = logs/alice_$(Cluster)_$(Process).out
+error                   = logs/alice_$(Cluster)_$(Process).err
+log                     = logs/alice_$(Cluster).log
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_output_files   = alice_$(P_PROC)_$(tune)_$(SEED).root
+transfer_output_remaps  = "alice_$(P_PROC)_$(tune)_$(SEED).root = ../alice/$(P_PROC)_$(tune)/alice_$(P_PROC)_$(tune)_$(SEED).root"
++JobFlavour             = "$(FLAVOUR:longlunch)"
+queue $(P_NJOBS) tune in ($(P_TUNES))

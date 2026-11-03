@@ -14,8 +14,10 @@
 //   - jet flavour = 2 (other/unmatched) for all jets (the analyzer takes it from the matched reco jet)
 //   - both V0 species in one pass (separate mixing pools, as separate analyzer jobs per species)
 //
-//   root -l -b -q 'genV0_analyzer.cpp+("<in.root>[,<in2.root>...]","<out prefix>"[,maxEvents,multBinned,ntrkScale])'
+//   root -l -b -q 'genV0_analyzer.cpp+("<in.root>[,<in2.root>...]","<out prefix>"[,maxEvents,multBinned,ntrkScale,pthatMin])'
 //   p-Pb: multBinned = true, ntrkScale = 0.844   ->  <out prefix>_Lam.root, <out prefix>_K0s.root
+//   pthatMin > 0: events with pTHat < pthatMin are skipped (p-Pb variant, see LOGBOOK 3d: the few low-pTHat events
+//   with a jet > 60 GeV carry most of the sum of w^2)
 // Condor: ../condor/corr.sub (10 files per job), merge with ../condor/merge_corr.sh
 #include <iostream>
 #include <vector>
@@ -106,10 +108,13 @@ struct Species {
 // multBinned: correlation sparses with the data multiplicity binning (p-Pb); ntrkScale: multiplicity = ntrkScale x
 // gen N_trk (hiBin). 0.844 converts the generator-level count to the reconstructed N_trk^offline (mean ratio in the
 // official PYTHIA skims, flat in N_trk, rms 6%), so that the data class edges (60, 80, 185, 250) apply directly.
-void genV0_analyzer(TString inFile, TString outPrefix, Long64_t maxEvents = -1, bool multBinned = false, double ntrkScale = 1.0) {
+// pthatMin: skip events with pTHat < pthatMin (0 = all events, nominal).
+void genV0_analyzer(TString inFile, TString outPrefix, Long64_t maxEvents = -1, bool multBinned = false, double ntrkScale = 1.0,
+                    double pthatMin = 0) {
     using namespace gana;
     gMultBinned = multBinned;
     std::cout << "multiplicity = " << ntrkScale << " x gen N_trk, correlation sparses " << (multBinned ? "in N_trk classes" : "multiplicity-integrated") << std::endl;
+    if (pthatMin > 0) std::cout << "events with pTHat < " << pthatMin << " skipped" << std::endl;
     TStopwatch sw; sw.Start();
     TH1::AddDirectory(kFALSE);
 
@@ -149,6 +154,7 @@ void genV0_analyzer(TString inFile, TString outPrefix, Long64_t maxEvents = -1, 
     const Long64_t n = maxEvents > 0 ? std::min(maxEvents, t->GetEntries()) : t->GetEntries();
     for (Long64_t i = 0; i < n; ++i) {
         t->GetEntry(i);
+        if (pthat < pthatMin) continue;
         const double w = weight;
         const double mult = ntrkScale * hiBin;
         // ---- gen V0 (as the analyzer: |eta| < kV0EtaMax, kV0PtMin <= pT < kV0PtMax; correlated from kCorrPtMin)
