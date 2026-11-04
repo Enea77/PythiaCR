@@ -11,4 +11,7 @@ OPT=""
 if [[ $2 == dijetppb* || $2 == *_mult_corr* ]]; then OPT=",-1,true,0.844"; else OPT=",-1,false,1.0"; fi
 # variant <sample>_pthat<N>: events with pTHat < N skipped
 if [[ $2 =~ _pthat([0-9]+)_corr ]]; then OPT="$OPT,${BASH_REMATCH[1]}"; fi
+# pp variant <sample>_jpct (same events): classes with the same fraction of jets as in data, gen N_ch edges from
+# condor/multmap_<sample>.txt (macros/jpct_edges.py), mapped onto the data N_trk classes
+if [[ $2 =~ ^(.*)_jpct_corr ]]; then OPT=",-1,true,1.0,0,\"$(cat /afs/cern.ch/work/e/eprifti/PythiaCR/condor/multmap_${BASH_REMATCH[1]}.txt)\""; fi
 root -l -b -q "genV0_analyzer.cpp+(\"$FILES\",\"$_CONDOR_SCRATCH_DIR/$2\"$OPT)"

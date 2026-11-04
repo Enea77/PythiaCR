@@ -53,3 +53,15 @@ if [ -z "$V" ]; then
         $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_K0s_MB.root "$(mclist mult${m}_ "${PPM[@]}")"
   done
 fi
+
+# pp samples in classes with the same fraction of jets as the data classes (<sample>_jpct, macros/jpct_edges.py),
+# all five in-cone classes -> plots/tunes_vs_data_mult_ppjpct/
+if [ -z "$V" ]; then
+  PPJ=("pp CUETP8M1:dijet_cuetp8m1_jpct" "pp CR-BLC 0:dijet_crblc_mode0_jpct" "pp CR-BLC 2:dijet_crblc_mode2_jpct"
+       "pp CR-BLC 3:dijet_crblc_mode3_jpct")
+  for c in 0to60:MB 60to80:MB 80to185:MB 185to250:HM185 250to1000:HM250; do
+    m=${c%%:*} t=${c##*:}
+    run plots/tunes_vs_data_mult_ppjpct/mult$m $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_Lam_$t.root \
+        $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_K0s_$t.root "$(mclist mult${m}_ "${PPJ[@]}")"
+  done
+fi

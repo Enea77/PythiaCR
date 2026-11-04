@@ -109,12 +109,34 @@ struct Species {
 // gen N_trk (hiBin). 0.844 converts the generator-level count to the reconstructed N_trk^offline (mean ratio in the
 // official PYTHIA skims, flat in N_trk, rms 6%), so that the data class edges (60, 80, 185, 250) apply directly.
 // pthatMin: skip events with pTHat < pthatMin (0 = all events, nominal).
+// multMap: "n1,n2,n3,n4" generated-N_ch edges of the five in-cone data classes (0-60, 60-80, 80-185, 185-250, 250+),
+// chosen so that each class has the same fraction of jets as in data (macros/jpct_edges.py). The event multiplicity is
+// then mapped linearly inside each class onto the data N_trk range of the class (ntrkScale is not used), so that
+// CorrCfg::MultBins(), jetshape.cpp and the data class edges apply unchanged. "" = mult = ntrkScale x hiBin (nominal).
 void genV0_analyzer(TString inFile, TString outPrefix, Long64_t maxEvents = -1, bool multBinned = false, double ntrkScale = 1.0,
-                    double pthatMin = 0) {
+                    double pthatMin = 0, TString multMap = "") {
     using namespace gana;
     gMultBinned = multBinned;
     std::cout << "multiplicity = " << ntrkScale << " x gen N_trk, correlation sparses " << (multBinned ? "in N_trk classes" : "multiplicity-integrated") << std::endl;
     if (pthatMin > 0) std::cout << "events with pTHat < " << pthatMin << " skipped" << std::endl;
+    const double dataEdges[6] = {0., 60., 80., 185., 250., 1000.};
+    std::vector<double> mapEdges;   // generated N_ch edges n0 = 0 < n1 < ... < n4 < n5 = 500
+    if (multMap != "") {
+        mapEdges.push_back(0.);
+        TObjArray* tk = multMap.Tokenize(",");
+        for (auto o : *tk) mapEdges.push_back(((TObjString*)o)->GetString().Atof());
+        delete tk;
+        mapEdges.push_back(500.);
+        if (mapEdges.size() != 6) { std::cerr << "FATAL: multMap needs 4 edges, got " << multMap << std::endl; return; }
+        std::cout << "multiplicity mapped: gen N_ch " << multMap << " -> N_trk 60, 80, 185, 250" << std::endl;
+    }
+    auto mapMult = [&](int nch) {
+        if (mapEdges.empty()) return ntrkScale * nch;
+        int k = 0;
+        while (k < 4 && nch >= mapEdges[k + 1]) ++k;
+        const double f = std::min(0.999, (nch - mapEdges[k]) / (mapEdges[k + 1] - mapEdges[k]));
+        return dataEdges[k] + f * (dataEdges[k + 1] - dataEdges[k]);
+    };
     TStopwatch sw; sw.Start();
     TH1::AddDirectory(kFALSE);
 
@@ -156,7 +178,7 @@ void genV0_analyzer(TString inFile, TString outPrefix, Long64_t maxEvents = -1, 
         t->GetEntry(i);
         if (pthat < pthatMin) continue;
         const double w = weight;
-        const double mult = ntrkScale * hiBin;
+        const double mult = mapMult(hiBin);
         // ---- gen V0 (as the analyzer: |eta| < kV0EtaMax, kV0PtMin <= pT < kV0PtMax; correlated from kCorrPtMin)
         for (int s = 0; s < 2; ++s) {
             auto& v = sp[s].vGen; v.clear();

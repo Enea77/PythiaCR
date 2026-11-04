@@ -15,7 +15,7 @@ for v in Lam K0s; do
   hadd -f -k $C/merged/MC_$v.root $C/${S}_corr*_$v.root > input_$S/hadd_$v.log 2>&1
   ln -sf $C/merged/MC_$v.root input_$S/MC_$v.root
   root -l -b -q "jetshape.cpp+(\"gen\",\"gen\",\"MC_$v\",\"input_$S/\",true,60,2,-1,-1,false,\"\")" > input_$S/js_MC_$v.log 2>&1
-  if [[ $S == dijetppb* || $S == *_mult ]]; then   # p-Pb and pp <sample>_mult: also the data N_trk classes (CorrCfg::MultBins)
+  if [[ $S == dijetppb* || $S == *_mult || $S == *_jpct ]]; then   # p-Pb, pp <sample>_mult and <sample>_jpct: also the data N_trk classes (CorrCfg::MultBins)
     CLS="0:60 60:80 80:185 185:250 250:1000"
     [[ $S == *_mult ]] && CLS="0:60 60:80 80:185"   # pp: no jet events in HM185 / HM250 (empty class -> jetshape.cpp fails)
     for c in $CLS; do
