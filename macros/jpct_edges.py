@@ -28,8 +28,8 @@ for s in sys.argv[1:]:
     files = lists[s]
     ev, jt = ROOT.TChain("hiEvtAnalyzer/HiTree"), ROOT.TChain("ak4PFJetAnalyzer/t")
     for f in files: ev.Add(f); jt.Add(f)
-    ev.AddFriend(jt)
-    df = ROOT.RDataFrame(ev).Define("nj", "nJets(t.genpt, t.WTAgeneta, t.ngen)").Define("wj", "weight * nj")
+    ev.AddFriend(jt, "jt")
+    df = ROOT.RDataFrame(ev).Define("nj", "nJets(jt.genpt, jt.WTAgeneta, jt.ngen)").Define("wj", "weight * nj")
     h = df.Histo1D(("h", ";gen N_{ch};jets", 500, 0, 500), "hiBin", "wj").GetValue()
     tot = h.Integral(1, 500)
     above = lambda b: h.Integral(b, 500) / tot          # fraction of jets with N_ch >= low edge of bin b
