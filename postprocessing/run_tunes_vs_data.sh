@@ -1,5 +1,6 @@
 #!/bin/bash
-# Data vs PYTHIA tunes with plot_tunes_vs_data.C: MB integrated (pp + p-Pb samples) and per N_trk class (p-Pb samples).
+# Data vs PYTHIA tunes with plot_tunes_vs_data.C: MB integrated (pp + p-Pb samples) and per N_trk class (p-Pb samples;
+# pp <sample>_mult samples in 0-60, 60-80, 80-185 -> plots/tunes_vs_data_mult_pp/).
 # Samples whose jetshape outputs do not exist yet are skipped.
 #   ./run_tunes_vs_data.sh           -> plots/tunes_vs_data_mult/<class>/{InCone_Ratio,DeltaR_Ratio,...,values.txt}
 #   ./run_tunes_vs_data.sh _pthat30  -> p-Pb samples <sample>_pthat30 (pTHat > 30), plots/tunes_vs_data_mult_pthat30/
@@ -38,3 +39,17 @@ for c in 0to60:MB 60to80:MB 80to185:MB 185to250:HM185 250to1000:HM250; do
   run $O/mult$m $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_Lam_$t.root \
       $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_K0s_$t.root "$(mclist mult${m}_ "${PPB[@]}")"
 done
+
+# pp samples in the data N_trk classes (<sample>_mult: same pp events, correlations filled in the data classes with
+# N_trk^offline = 0.844 x gen N_ch). Only 0-60, 60-80, 80-185: pp jet events do not reach HM185.
+#   -> plots/tunes_vs_data_mult_pp/mult<lo>to<hi>/
+if [ -z "$V" ]; then
+  PPM=("pp CUETP8M1:dijet_cuetp8m1_mult" "pp CR-BLC 0:dijet_crblc_mode0_mult" "pp CR-BLC 2:dijet_crblc_mode2_mult"
+       "pp CR-BLC 3:dijet_crblc_mode3_mult")
+  run plots/tunes_vs_data_mult_pp/MB $D/jetshapes_rebinned_ijc_reco_reco_Data_Lam_MB.root \
+      $D/jetshapes_rebinned_ijc_reco_reco_Data_K0s_MB.root "$(mclist "" "${PPM[@]}")"
+  for m in 0to60 60to80 80to185; do
+    run plots/tunes_vs_data_mult_pp/mult$m $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_Lam_MB.root \
+        $D/jetshapes_rebinned_ijc_mult${m}_reco_reco_Data_K0s_MB.root "$(mclist mult${m}_ "${PPM[@]}")"
+  done
+fi
